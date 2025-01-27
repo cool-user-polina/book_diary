@@ -1,0 +1,18 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<h1>Ваши книги</h1>
+<a href="{% url 'book_create' %}" class="btn">Добавить книгу</a>
+
+<ul>
+  {% for book in books %}
+    <li>
+      {{ book.name }} ({{ book.author }})
+      <a href="{% url 'book_edit' book.pk %}">✏️</a>
+      <a href="{% url 'book_delete' book.pk %}">🗑️</a>
+    </li>
+  {% empty %}
+    <p>Пока нет книг. Добавьте первую!</p>
+  {% endfor %}
+</ul>
+{% endblock %}

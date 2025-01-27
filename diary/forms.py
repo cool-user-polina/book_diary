@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .models import User
+from .models import Book
 
 # Форма регистрации
 class RegistrationForm(UserCreationForm):
@@ -11,3 +12,13 @@ class RegistrationForm(UserCreationForm):
 # Форма входа (переопределяем стандартную)
 class CustomLoginForm(AuthenticationForm):
     username = forms.EmailField(label='Email')  # Меняем label на "Email"
+
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['author', 'name', 'genre', 'year', 'impression']
+        widgets = {
+            'year': forms.NumberInput(attrs={'min': 1900, 'max': 2100}),
+        }

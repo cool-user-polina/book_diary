@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from .forms import RegistrationForm, CustomLoginForm
+from .forms import RegistrationForm, CustomLoginForm,BookForm
+from django.contrib.auth.decorators import login_required
+from .models import Book
+from django.shortcuts import redirect  # Добавьте этот импорт
 
 # Регистрация
 def register(request):
@@ -34,5 +37,45 @@ def custom_logout(request):
 # Главная страница (только для авторизованных)
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('login')  # Перенаправляем неавторизованных
-    return render(request, 'diary/home.html')
+        return redirect('login') 
+    else: 
+        return redirect('book_list')
+
+
+@login_required
+def book_list(request):
+    books = Book.objects.filter(user=request.user)
+    return render(request, 'diary/book_list.html', {'books': books})
+
+@login_required
+def book_create(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.user = request.user  # Привязываем книгу к пользователю
+            book.save()
+            return redirect('book_list')
+    else:
+        form = BookForm()
+    return render(request, 'diary/book_form.html', {'form': form})
+
+@login_required
+def book_edit(request, pk):
+    book = Book.objects.get(pk=pk, user=request.user)  # Только свои книги
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('book_list')
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'diary/book_form.html', {'form': form})
+
+@login_required
+def book_delete(request, pk):
+    book = Book.objects.get(pk=pk, user=request.user)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('book_list')
+    return render(request, 'diary/book_confirm_delete.html', {'book': book})

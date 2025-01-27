@@ -23,5 +23,9 @@ urlpatterns = [
     path('register/', diary_views.register, name='register'),  # Регистрация
     path('login/', diary_views.custom_login, name='login'),    # Вход
     path('logout/', diary_views.custom_logout, name='logout'), # Выход
-    path('', diary_views.home, name='home'),                   # Главная страница
-]
+    path('', diary_views.home, name='home'),    
+    path('books/', diary_views.book_list, name='book_list'),
+    path('books/create/', diary_views.book_create, name='book_create'),
+    path('books/<int:pk>/edit/', diary_views.book_edit, name='book_edit'),
+    path('books/<int:pk>/delete/', diary_views.book_delete, name='book_delete'),
+]              

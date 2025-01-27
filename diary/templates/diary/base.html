@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Book Diary</title>
@@ -9,6 +10,10 @@
     <!-- Дополнительные стили -->
     {% block extra_css %}{% endblock %}
 </head>
+<head>
+    ...
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  </head>
 <body class="bg-light">
     <header class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -26,6 +31,11 @@
             </div>
         </div>
     </header>
+    <header>
+        <a href="{% url 'home' %}">Главная</a>
+        <a href="{% url 'book_list' %}">Мои книги</a>
+        ...
+      </header>
     
     <main class="container my-5">
         {% block content %}
