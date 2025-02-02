@@ -60,6 +60,13 @@ def book_create(request):
         form = BookForm()
     return render(request, 'diary/book_form.html', {'form': form})
 
+from django.shortcuts import get_object_or_404
+
+@login_required
+def book_detail(request, pk):
+    book = get_object_or_404(Book, pk=pk, user=request.user)  # Только свои книги
+    return render(request, 'diary/book_detail.html', {'book': book})
+
 @login_required
 def book_edit(request, pk):
     book = Book.objects.get(pk=pk, user=request.user)  # Только свои книги

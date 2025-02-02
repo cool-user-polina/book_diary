@@ -28,4 +28,5 @@ urlpatterns = [
     path('books/create/', diary_views.book_create, name='book_create'),
     path('books/<int:pk>/edit/', diary_views.book_edit, name='book_edit'),
     path('books/<int:pk>/delete/', diary_views.book_delete, name='book_delete'),
+    path('books/<int:pk>/', diary_views.book_detail, name='book_detail'),
 ]              

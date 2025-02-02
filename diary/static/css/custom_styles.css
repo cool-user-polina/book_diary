@@ -1,0 +1,115 @@
+/* Основные стили сайта */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa; /* Светлый фон */
+    color: #343a40; /* Основной текст */
+}
+
+h1, h2, h3 {
+    color: #4CAF50; /* Приятный зеленый цвет для заголовков */
+}
+
+.navbar {
+    background-color: #4CAF50; /* Основной цвет навбара */
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    text-decoration: underline;
+}
+
+a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки */
+.btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #45a049;
+    color: #ffffff;
+}
+
+/* Карточки */
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Списки книг */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+li a {
+    margin-left: 10px;
+    color: #6c757d;
+}
+
+li a:hover {
+    color: #4CAF50;
+}
+
+/* Формы */
+form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+form button {
+    width: 100%;
+}
+
+/* Заголовки */
+h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+}

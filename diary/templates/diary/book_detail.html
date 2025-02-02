@@ -1,0 +1,16 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ book.name }}</h1>
+    <p><strong>Автор:</strong> {{ book.author }}</p>
+    <p><strong>Жанр:</strong> {{ book.get_genre_display }}</p>
+    <p><strong>Год издания:</strong> {{ book.year }}</p>
+    <p><strong>Ваши впечатления:</strong></p>
+    <p>{{ book.impression }}</p>
+    <p><strong>Дата добавления:</strong> {{ book.created_at }}</p>
+    <a href="{% url 'book_edit' book.pk %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'book_list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}
