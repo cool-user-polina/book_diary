@@ -1,11 +1,72 @@
 {% extends 'diary/base.html' %}
 
 {% block content %}
-<h2>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} книгу</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Сохранить</button>
-</form>
-<a href="{% url 'book_list' %}">Назад к списку</a>
+<div class="container">
+    <h2 class="mb-4">{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} книгу</h2>
+    
+    <form method="post" class="col-md-8">
+        {% csrf_token %}
+        
+        <!-- Поле "Автор" -->
+        <div class="mb-3">
+            <label for="{{ form.author.id_for_label }}" class="form-label">Автор*</label>
+            {{ form.author }}
+            {% if form.author.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.author.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Название" -->
+        <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Название книги*</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.name.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Жанр" -->
+        <div class="mb-3">
+            <label for="{{ form.genre.id_for_label }}" class="form-label">Жанр*</label>
+            {{ form.genre }}
+            {% if form.genre.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.genre.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Год издания" -->
+        <div class="mb-3">
+            <label for="{{ form.year.id_for_label }}" class="form-label">Год издания*</label>
+            {{ form.year }}
+            <small class="form-text text-muted">Год должен быть между 1000 и 2100</small>
+            {% if form.year.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.year.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Впечатления" -->
+        <div class="mb-4">
+            <label for="{{ form.impression.id_for_label }}" class="form-label">Ваши впечатления</label>
+            {{ form.impression }}
+            {% if form.impression.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.impression.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
