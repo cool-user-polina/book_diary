@@ -148,3 +148,13 @@ textarea.form-control {
     font-size: 0.875em;
     margin-top: 6px;
 }
+
+.book-cover img {
+    width: 80px;
+    height: 120px;
+}
+
+.book-cover img:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}

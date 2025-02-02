@@ -6,8 +6,21 @@
 
 <ul class="list-group">
   {% for book in books %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <a href="{% url 'book_detail' book.pk %}">{{ book.name }} ({{ book.author }})</a>
+    <li class="list-group-item d-flex justify-content-between align-items-center clickable" data-url="{% url 'book_detail' book.pk %}">
+      <!-- Заглушка для картинки -->
+      <div class="d-flex align-items-center">
+        <div class="book-cover me-3">
+          <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги" class="img-thumbnail">
+        </div>
+        <div>
+          <h5 class="mb-1">{{ book.name }}</h5>
+          <p class="mb-1 text-muted">{{ book.author }}</p>
+          <small class="text-muted">{{ book.get_genre_display }}</small>
+        </div>
+      </div>
+      <div>
+        <small class="text-muted">{{ book.created_at|date:"d.m.Y H:i" }}</small>
+      </div>
       <div>
         <a href="{% url 'book_delete' book.pk %}" class="btn btn-sm btn-danger">🗑️</a>
       </div>
@@ -16,4 +29,18 @@
     <p class="text-muted">Пока нет книг. Добавьте первую!</p>
   {% endfor %}
 </ul>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const clickableItems = document.querySelectorAll('.clickable');
+    clickableItems.forEach(item => {
+      item.addEventListener('click', function(event) {
+        // Проверяем, чтобы клик не был на кнопке удаления
+        if (!event.target.closest('a')) {
+          window.location.href = this.dataset.url;
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
