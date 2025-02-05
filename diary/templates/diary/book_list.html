@@ -22,7 +22,7 @@
         <small class="text-muted">{{ book.created_at|date:"d.m.Y H:i" }}</small>
       </div>
       <div>
-        <a href="{% url 'book_delete' book.pk %}" class="btn btn-sm btn-danger">🗑️</a>
+        <a href="{% url 'book_delete' book.pk %}" class="btn  btn-danger">🗑️</a>
       </div>
     </li>
   {% empty %}

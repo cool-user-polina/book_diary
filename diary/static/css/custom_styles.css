@@ -1,20 +1,34 @@
 /* Основные стили сайта */
+:root {
+    --primary-color: #39594e;
+    --secondary-color: #12131b; 
+    --background-color: #f9e9e3;
+    --text-color: #12131b;
+    --navbar: #383a4e;
+    --brand: #c3dedf;
+    --book-card-color : #a1a8be; 
+    --button-color:  #2247ae;
+    --dangerous-button-color:  #8b2222;
+    --font-family: 'Roboto', sans-serif;
+}
+
+
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa; /* Светлый фон */
-    color: #343a40; /* Основной текст */
+    font-family:var(--font-family);
+    background-color:var(--background-color); /* Светлый фон */
+    color:var(--text-color); /* Основной текст */
 }
 
 h1, h2, h3 {
-    color: #4CAF50; /* Приятный зеленый цвет для заголовков */
+    color:var(--text-color); /* Приятный зеленый цвет для заголовков */
 }
 
 .navbar {
-    background-color: #4CAF50; /* Основной цвет навбара */
+    background-color:var( --navbar); /* Основной цвет навбара */
 }
 
 .navbar-brand, .navbar-nav .nav-link {
-    color: #ffffff !important;
+    color: var(--brand);
 }
 
 .navbar-nav .nav-link:hover {
@@ -27,12 +41,12 @@ a {
 }
 
 a:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 /* Кнопки */
 .btn {
-    background-color: #4CAF50;
+    background-color:var( --button-color);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -41,22 +55,15 @@ a:hover {
     transition: all 0.3s ease;
 }
 
+.btn-danger {
+    background-color:var( --dangerous-button-color);
+}
+
 .btn:hover {
-    background-color: #45a049;
+    background-color:var( --text-color);
     color: #ffffff;
 }
 
-/* Карточки */
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 10px;
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
 
 /* Списки книг */
 ul {
@@ -66,23 +73,11 @@ ul {
 
 li {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-li:last-child {
-    border-bottom: none;
-}
-
-li a {
-    margin-left: 10px;
-    color: #6c757d;
-}
-
-li a:hover {
-    color: #4CAF50;
+    background-color:var( --book-card-color) !important;
 }
 
 /* Формы */
@@ -95,24 +90,6 @@ form button {
     width: 100%;
 }
 
-/* Заголовки */
-h1 {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-h2 {
-    margin-bottom: 15px;
-}
-
-/* Footer */
-footer {
-    background-color: #343a40;
-    color: #ffffff;
-    padding: 20px 0;
-    text-align: center;
-    margin-top: 40px;
-}
 
 /* Стилизация полей формы */
 .form-control {
