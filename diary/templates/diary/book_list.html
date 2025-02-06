@@ -1,46 +1,66 @@
 {% extends 'diary/base.html' %}
 
 {% block content %}
-<h1>Ваши книги</h1>
-<a href="{% url 'book_create' %}" class="btn btn-success mb-3">Добавить книгу</a>
+<h1 class="text-center"> Моя книжная полка </h1>
 
-<ul class="list-group">
-  {% for book in books %}
-    <li class="list-group-item d-flex justify-content-between align-items-center clickable" data-url="{% url 'book_detail' book.pk %}">
-      <!-- Заглушка для картинки -->
-      <div class="d-flex align-items-center">
-        <div class="book-cover me-3">
-          <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги" class="img-thumbnail">
+<!-- Форма поиска -->
+<form method="GET" action="{% url 'book_list' %}" class="mb-3">
+    <input type="text" name="q" value="{{ query }}" placeholder="Введите название или автора">
+    <button type="submit">🔍 Поиск</button>
+</form>
+
+<a href="{% url 'book_create' %}" class="btn btn-success mb-3">➕ Добавить книгу</a>
+
+<div class="bookshelf">
+  <h3>📚 Мои книги</h3>
+  <div class="book-row">
+    {% for book in books %}
+      <div class="book-card" style="background-color: {{ colors|random }};">
+        <div class="book-cover">
+          <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги">
         </div>
-        <div>
-          <h5 class="mb-1">{{ book.name }}</h5>
-          <p class="mb-1 text-muted">{{ book.author }}</p>
+        <div class="book-info">
+          <h5>{{ book.name }}</h5>
+          <p class="mb-1 text-muted book-author">{{ book.author }}</p>
           <small class="text-muted">{{ book.get_genre_display }}</small>
         </div>
+        <div class="book-actions">
+          <a href="{% url 'book_detail' book.pk %}" class="btn btn-info">👁️</a>
+          <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️</a>
+        </div>
       </div>
-      <div>
-        <small class="text-muted">{{ book.created_at|date:"d.m.Y H:i" }}</small>
-      </div>
-      <div>
-        <a href="{% url 'book_delete' book.pk %}" class="btn  btn-danger">🗑️</a>
-      </div>
-    </li>
-  {% empty %}
-    <p class="text-muted">Пока нет книг. Добавьте первую!</p>
-  {% endfor %}
-</ul>
+      {% if forloop.counter|divisibleby:3 %}
+        </div><div class="book-row">
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const clickableItems = document.querySelectorAll('.clickable');
-    clickableItems.forEach(item => {
-      item.addEventListener('click', function(event) {
-        // Проверяем, чтобы клик не был на кнопке удаления
-        if (!event.target.closest('a')) {
-          window.location.href = this.dataset.url;
-        }
-      });
-    });
-  });
-</script>
+{% if not books and not api_books %}
+    <p class="text-center">Ничего не найдено.</p>
+{% endif %}
+
+<!-- Раздел с книгами из Open Library API -->
+{% if api_books %}
+<div class="bookshelf">
+  <h3>🌍 Найдено в Open Library</h3>
+  <div class="book-row">
+    {% for book in api_books %}
+      <div class="book-card" style="background-color: {{ colors|random }};">
+        <div class="book-cover">
+          <img src="{{ book.cover }}" alt="Обложка книги">
+        </div>
+        <div class="book-info">
+          <h5>{{ book.title }}</h5>
+          <p class="mb-1 text-muted book-author">{{ book.author }}</p>
+        </div>
+      </div>
+      {% if forloop.counter|divisibleby:3 %}
+        </div><div class="book-row">
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

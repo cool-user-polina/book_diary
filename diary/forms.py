@@ -18,7 +18,7 @@ class CustomLoginForm(AuthenticationForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['author', 'name', 'genre', 'year', 'impression']
+        fields = ['author', 'name', 'start_reading','end_reading', 'genre', 'year', 'impression']
         widgets = {
-            'year': forms.NumberInput(attrs={'min': 1900, 'max': 2100}),
+            'year': forms.NumberInput(attrs={'min': 0, 'max': 2100}),
         }

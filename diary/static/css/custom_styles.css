@@ -1,137 +1,181 @@
-/* Основные стили сайта */
+/* Основные стили */
 :root {
-    --primary-color: #39594e;
-    --secondary-color: #12131b; 
-    --background-color: #f9e9e3;
-    --text-color: #12131b;
-    --navbar: #383a4e;
-    --brand: #c3dedf;
-    --book-card-color : #a1a8be; 
-    --button-color:  #2247ae;
-    --dangerous-button-color:  #8b2222;
+    --background-color: #f5f1e3;  /* Светло-бежевый фон */
+    --shelf-color: #8B5A2B;       /* Коричневый цвет полки */
+    --book-cover-bg: #5A7D5A;     /* Зелёный цвет книг */
+    --text-color: #3E2723;        /* Тёмно-коричневый */
+    --hover-color: #4E8C4A;       /* Темно-зелёный для наведения */
+    --danger-color: #731a20;      /* Красный */
+    --button-color: #a58e6c;
     --font-family: 'Roboto', sans-serif;
 }
 
-
+/* Фон и шрифты */
 body {
-    font-family:var(--font-family);
-    background-color:var(--background-color); /* Светлый фон */
-    color:var(--text-color); /* Основной текст */
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
-h1, h2, h3 {
-    color:var(--text-color); /* Приятный зеленый цвет для заголовков */
+/* Заголовок */
+h1 {
+    text-align: center;
+    color: var(--text-color);
 }
 
-.navbar {
-    background-color:var( --navbar); /* Основной цвет навбара */
+/* Книжная полка */
+.bookshelf {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--shelf-color);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin: 20px auto;
+    max-width: 900px;
 }
 
-.navbar-brand, .navbar-nav .nav-link {
-    color: var(--brand);
-}
-
-.navbar-nav .nav-link:hover {
-    text-decoration: underline;
-}
-
-a {
-    color: #4CAF50;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: none;
-}
-
-/* Кнопки */
-.btn {
-    background-color:var( --button-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.btn-danger {
-    background-color:var( --dangerous-button-color);
-}
-
-.btn:hover {
-    background-color:var( --text-color);
-    color: #ffffff;
-}
-
-
-/* Списки книг */
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    padding: 10px;
-    border-bottom: 1px solid;
+/* Один ряд с 3 книгами */
+.book-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    background-color:var( --book-card-color) !important;
+    gap: 20px;
+    padding: 20px;
+    border: 4px solid var(--shelf-color); /* Коричневая рамка */
+    border-radius: 10px;
+    background-color:var( --background-color); /* Светло-коричневый фон */
+    width: 100%;
 }
 
-/* Формы */
-form {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-form button {
+/* Контейнер для всех книг (с максимальной шириной и выравниванием) */
+.book-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    overflow: visible;
     width: 100%;
 }
 
 
-/* Стилизация полей формы */
-.form-control {
-    border-radius: 8px;
-    padding: 12px;
-    border: 2px solid #dee2e6;
-    transition: all 0.3s ease;
+/* Карточка книги */
+.book-card {
+    background-color: var(--book-cover-bg);
+    color: white;
+    width: 150px;
+    height: 250px;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+    text-align: center;
+    overflow: visible; /* ВАЖНО: чтобы кнопки не обрезались */
+    position: relative;
 }
 
-.form-control:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+
+/* Автор книги с троеточием, если текст длинный */
+.book-author {
+    white-space: nowrap;  /* Запрещает перенос строки */
+    overflow: hidden;  /* Обрезает лишний текст */
+    text-overflow: ellipsis;  /* Добавляет "..." */
+    max-width: 130px;  /* Ограничение ширины */
+    display: block;  /* Делаем блочным, чтобы ограничение работало */
 }
 
-select.form-control {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 18px;
+
+/* Информация о книге */
+.book-info {
+    text-align: center;
+    font-size: 14px;
+    flex-grow: 1;
+    padding: 5px;
 }
 
-textarea.form-control {
-    min-height: 120px;
-    resize: vertical;
-}
 
-.form-text {
-    font-size: 0.875em;
-}
 
-.invalid-feedback {
-    font-size: 0.875em;
-    margin-top: 6px;
-}
 
-.book-cover img {
-    width: 80px;
-    height: 120px;
-}
-
-.book-cover img:hover {
+.book-card:hover {
     transform: scale(1.05);
-    transition: transform 0.2s ease;
+    background-color: var(--hover-color);
+}
+
+/* Обложка книги */
+.book-cover img {
+    width: 100px;
+    height: 150px;
+    border-radius: 5px;
+}
+
+/* Название книги */
+.book-info h5 {
+    font-size: 14px;
+    margin: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+}
+
+
+
+/* Контейнер для кнопок */
+.book-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    width: 100%;
+    position: absolute;
+    bottom: -20px; /* Вынесли кнопки за рамку */
+    left: 0;
+    transform: translateY(10px); /* Подвинул вниз, чтобы кнопки не обрезались */
+}
+/* Кнопки действий */
+.book-actions .btn {
+    padding: 5px;
+    font-size: 18px; /* Размер шрифта для текста в кнопках */
+    font-family: 'Arial', sans-serif; /* Новый шрифт для текста */
+    color: #ffffff; /* Белый цвет текста */
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Добавили тень */
+    background-color: var(--button-color); /* Цвет фона кнопки */
+    border: none; /* Убираем обводку по умолчанию */
+}
+
+/* Цвет текста на кнопках при наведении */
+.book-actions .btn:hover {
+    background-color: #cdb085;
+    color: white; /* Белый цвет текста при наведении */
+}
+
+/* Изменим цвет для разных типов кнопок */
+.book-actions .btn-info {
+    background-color: var(--button-color); /* Синий цвет для кнопки "детали" */
+    border: 2px solid var(--button-color); /* Добавляем обводку, подходящую по цвету */
+}
+
+.book-actions .btn-info:hover {
+    background-color: #cdb085; /* При наведении на кнопку "детали" */
+    border: 2px solid #cdb085; /* Обводка меняет цвет на более светлый */
+}
+
+.book-actions .btn-danger {
+    background-color: var(--danger-color); /* Красный цвет для кнопки "удалить" */
+    border: 2px solid var(--danger-color); /* Добавляем обводку, подходящую по цвету */
+}
+
+.book-actions .btn-danger:hover {
+    background-color: #8e2128; /* Оранжевый для кнопки "удалить" при наведении */
+    border: 2px solid #8e2128; /* Обводка меняет цвет на более оранжевый */
 }

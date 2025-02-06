@@ -44,7 +44,7 @@
         <div class="mb-3">
             <label for="{{ form.year.id_for_label }}" class="form-label">Год издания*</label>
             {{ form.year }}
-            <small class="form-text text-muted">Год должен быть между 1000 и 2100</small>
+            <small class="form-text text-muted">Год должен быть между 0  и 2100</small>
             {% if form.year.errors %}
                 <div class="invalid-feedback d-block">
                     {{ form.year.errors }}

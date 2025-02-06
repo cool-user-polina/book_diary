@@ -4,6 +4,10 @@ from .forms import RegistrationForm, CustomLoginForm,BookForm
 from django.contrib.auth.decorators import login_required
 from .models import Book
 from django.shortcuts import redirect  # Добавьте этот импорт
+from random import choice
+import requests
+from django.db.models import Q
+
 
 # Регистрация
 def register(request):
@@ -40,12 +44,48 @@ def home(request):
         return redirect('login') 
     else: 
         return redirect('book_list')
+    
+def search_books(query):
+    url = f"https://openlibrary.org/search.json?q={query}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        books = data.get("docs", [])
+        return books
+    return []
 
 
 @login_required
 def book_list(request):
-    books = Book.objects.filter(user=request.user)
-    return render(request, 'diary/book_list.html', {'books': books})
+    query = request.GET.get('q', '')  # Получаем поисковый запрос
+    books = Book.objects.filter(user=request.user)  # Книги пользователя
+    api_books = []  # Книги из Open Library API
+
+    if query:
+        # Фильтр по базе данных
+        books = books.filter(Q(name__icontains=query) | Q(author__icontains=query))
+
+        # Запрос в Open Library API
+        api_url = f"https://openlibrary.org/search.json?q={query}"
+        response = requests.get(api_url)
+
+        if response.status_code == 200:
+            data = response.json()
+            for doc in data.get('docs', [])[:5]:  # Берем первые 5 книг из результата
+                api_books.append({
+                    'title': doc.get('title', 'Без названия'),
+                    'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
+                    'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150"
+                })
+
+    colors = ['#3E2723', '#5A7D5A', '#797444', '#643811', '#a46572']
+    
+    return render(request, 'diary/book_list.html', {
+        'books': books,
+        'api_books': api_books,
+        'query': query,
+        'colors': colors
+    })
 
 @login_required
 def book_create(request):
@@ -86,3 +126,4 @@ def book_delete(request, pk):
         book.delete()
         return redirect('book_list')
     return render(request, 'diary/book_confirm_delete.html', {'book': book})
+
