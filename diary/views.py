@@ -71,7 +71,7 @@ def book_list(request):
 
         if response.status_code == 200:
             data = response.json()
-            for doc in data.get('docs', [])[:5]:  # Берем первые 5 книг из результата
+            for doc in data.get('docs', [])[:20]:  # Берем первые 5 книг из результата
                 api_books.append({
                     'title': doc.get('title', 'Без названия'),
                     'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
@@ -91,6 +91,9 @@ def book_list(request):
 def book_create(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
+        print('before validation')
+        for field in form:
+            print(f"Field {field.name}  Error: {field.errors}")
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user  # Привязываем книгу к пользователю
@@ -127,3 +130,22 @@ def book_delete(request, pk):
         return redirect('book_list')
     return render(request, 'diary/book_confirm_delete.html', {'book': book})
 
+
+@login_required
+def add_book_from_api(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        author = request.POST.get("author")
+        cover_url = request.POST.get("cover")
+        year = request.POST.get("year")  # Добавляем получение года
+
+        # Если год не передан, задаем значение по умолчанию (например, 0 или None)
+        year = int(year) if year else None  
+
+
+        # Создаем объект книги
+        book = Book.objects.create(name=title, author=author, cover_url=cover_url, year=year, user=request.user)
+
+        return redirect("book_list")
+
+    return redirect("book_list")

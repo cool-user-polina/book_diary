@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from diary import views as diary_views  # Импортируем наши view-функции
+from diary.views import add_book_from_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,6 @@ urlpatterns = [
     path('books/<int:pk>/edit/', diary_views.book_edit, name='book_edit'),
     path('books/<int:pk>/delete/', diary_views.book_delete, name='book_delete'),
     path('books/<int:pk>/', diary_views.book_detail, name='book_detail'),
-]              
+    path('add_book_from_api/', add_book_from_api, name='add_book_from_api'),
+]
+          

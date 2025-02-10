@@ -13,7 +13,8 @@
 
 <div class="bookshelf">
   <h3>📚 Мои книги</h3>
-  <div class="book-row">
+  {% if books %}
+    <div class="book-row"> <!-- Открываем первый ряд -->
     {% for book in books %}
       <div class="book-card" style="background-color: {{ colors|random }};">
         <div class="book-cover">
@@ -29,16 +30,17 @@
           <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️</a>
         </div>
       </div>
-      {% if forloop.counter|divisibleby:3 %}
-        </div><div class="book-row">
-      {% endif %}
-    {% endfor %}
-  </div>
-</div>
 
-{% if not books and not api_books %}
-    <p class="text-center">Ничего не найдено.</p>
-{% endif %}
+      {% if forloop.counter|divisibleby:3 and not forloop.last %}
+        </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
+      {% endif %}
+      
+    {% endfor %}
+    </div> <!-- Закрываем последний ряд -->
+  {% else %}
+    <p class="text-center">Вы еще не добавили книги.</p>
+  {% endif %}
+</div>
 
 <!-- Раздел с книгами из Open Library API -->
 {% if api_books %}
@@ -53,6 +55,16 @@
         <div class="book-info">
           <h5>{{ book.title }}</h5>
           <p class="mb-1 text-muted book-author">{{ book.author }}</p>
+        </div>
+        <div class="book-actions">
+            <form method="POST" action="{% url 'add_book_from_api' %}">
+                {% csrf_token %}
+                <input type="hidden" name="title" value="{{ book.title }}">
+                <input type="hidden" name="author" value="{{ book.author }}">
+                <input type="hidden" name="cover" value="{{ book.cover }}">
+                <input type="hidden" name="year" value="{{ book.year }}">
+                <button type="submit" class="btn btn-primary">➕ Добавить</button>
+            </form>
         </div>
       </div>
       {% if forloop.counter|divisibleby:3 %}

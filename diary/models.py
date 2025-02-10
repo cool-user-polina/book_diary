@@ -45,7 +45,7 @@ class Book(models.Model):
         ('MAGICREALISM', 'Магический реализм'),
 ]
     genre = models.CharField(max_length=20, choices=GENRE_CHOICES)
-    year = models.IntegerField()
+    year = models.IntegerField(null=True, blank=True)
     impression = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     isbn = models.CharField(max_length=13, unique=True, null=True, blank=True)
