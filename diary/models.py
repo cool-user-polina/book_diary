@@ -12,8 +12,8 @@ class Book(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     author = models.CharField(max_length=100)
     name = models.CharField(max_length=200)
-    start_reading = models.DateField(null=True)
-    end_reading = models.DateField(null=True)
+    start_reading = models.DateField(null=True,  blank=True)
+    end_reading = models.DateField(null=True,  blank=True)
     GENRE_CHOICES = [
         ('FANTASY', 'Фэнтези'),
         ('SCIFI', 'Научная фантастика'),

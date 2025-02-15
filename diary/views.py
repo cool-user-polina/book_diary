@@ -7,7 +7,8 @@ from django.shortcuts import redirect  # Добавьте этот импорт
 from random import choice
 import requests
 from django.db.models import Q
-
+from django.shortcuts import get_object_or_404
+from datetime import datetime 
 
 # Регистрация
 def register(request):
@@ -103,7 +104,6 @@ def book_create(request):
         form = BookForm()
     return render(request, 'diary/book_form.html', {'form': form})
 
-from django.shortcuts import get_object_or_404
 
 @login_required
 def book_detail(request, pk):
@@ -147,5 +147,47 @@ def add_book_from_api(request):
         book = Book.objects.create(name=title, author=author, cover_url=cover_url, year=year, user=request.user)
 
         return redirect("book_list")
+        
 
     return redirect("book_list")
+
+@login_required
+def edit_book_from_api(request):
+    """Позволяет редактировать книгу перед добавлением из Open Library API."""
+    title = request.GET.get("title", "")
+    author = request.GET.get("author", "")
+    year = request.GET.get("year", "")
+    cover = request.GET.get("cover", "")  # Обложка передаётся, но не запрашивается у пользователя
+
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.user = request.user
+            book.cover_url = cover  # Автоматически сохраняем обложку
+
+            # Обрабатываем даты, если они пустые
+            start_reading = request.POST.get("start_reading")
+            end_reading = request.POST.get("end_reading")
+
+            try:
+                book.start_reading = datetime.strptime(start_reading, "%Y-%m-%d") if start_reading else None
+                book.end_reading = datetime.strptime(end_reading, "%Y-%m-%d") if end_reading else None
+            except ValueError:
+                book.start_reading = None
+                book.end_reading = None
+
+            # Сохраняем книгу
+            book.save()
+            return redirect("book_list")
+        else:
+            print("Ошибки в форме:", form.errors)  # Выводим ошибки
+
+    else:
+        form = BookForm(initial={
+            "name": title,
+            "author": author,
+            "year": year if year else None,  # Если year пустой, ставим None
+        })
+
+    return render(request, "diary/edit_book.html", {"form": form, "cover": cover})

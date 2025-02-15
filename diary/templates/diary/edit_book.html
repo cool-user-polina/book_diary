@@ -1,0 +1,26 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Редактирование книги перед добавлением</h2>
+
+    <div class="book-cover text-center mb-3">
+        <img src="{{ cover }}" alt="Обложка книги" class="img-fluid" style="max-width: 200px;">
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <label>Дата начала чтения:</label>
+        <input type="date" name="start_reading" value="{{ form.start_reading.value|default:'' }}">
+    
+        <label>Дата окончания чтения:</label>
+        <input type="date" name="end_reading" value="{{ form.end_reading.value|default:'' }}">
+    
+        <input type="hidden" name="cover" value="{{ cover }}">
+        <button type="submit" class="btn btn-success">✅ Сохранить</button>
+        <a href="{% url 'book_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}
+    

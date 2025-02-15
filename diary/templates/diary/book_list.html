@@ -65,14 +65,15 @@
                 <input type="hidden" name="year" value="{{ book.year }}">
                 <button type="submit" class="btn btn-primary">➕ Добавить</button>
             </form>
+            <a href="{% url 'edit_book_from_api' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}&year={{ book.year|urlencode }}&cover={{ book.cover|urlencode }}" 
+               class="btn btn-warning">✏️ Редактировать</a>
         </div>
       </div>
       {% if forloop.counter|divisibleby:3 %}
-        </div><div class="book-row">
+        </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
       {% endif %}
     {% endfor %}
   </div>
 </div>
 {% endif %}
-
 {% endblock %}
