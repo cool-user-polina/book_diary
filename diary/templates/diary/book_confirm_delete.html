@@ -1,11 +1,10 @@
 {% extends 'diary/base.html' %}
 
 {% block content %}
-<h2>Удалить книгу?</h2>
-<p>Вы уверены, что хотите удалить "{{ book.name }}"?</p>
+<h1>Вы уверены, что хотите удалить книгу "{{ book.name }}"?</h1>
 <form method="post">
-  {% csrf_token %}
-  <button type="submit">Да, удалить</button>
-  <a href="{% url 'book_list' %}">Отмена</a>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    <a href="{% url 'book_list' %}" class="btn btn-secondary">Отмена</a>
 </form>
 {% endblock %}

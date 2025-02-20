@@ -104,11 +104,22 @@ def book_create(request):
         form = BookForm()
     return render(request, 'diary/book_form.html', {'form': form})
 
+@login_required
+def book_delete_confirm(request, pk):
+    book = Book.objects.get(pk=pk, user=request.user)
+    if request.method == 'POST':
+        # Удаляем книгу
+        book.delete()
+        return redirect('book_list')  # После удаления редиректим на список книг
+    return render(request, 'diary/book_confirm_delete.html', {'book': book})
+
+
 
 @login_required
-def book_detail(request, pk):
-    book = get_object_or_404(Book, pk=pk, user=request.user)  # Только свои книги
-    return render(request, 'diary/book_detail.html', {'book': book})
+def book_detail(request, book_id):
+    """Отображает страницу книги с кнопкой редактирования."""
+    book = get_object_or_404(Book, id=book_id, user=request.user)
+    return render(request, "diary/book_detail.html", {"book": book})
 
 @login_required
 def book_edit(request, pk):
@@ -152,12 +163,47 @@ def add_book_from_api(request):
     return redirect("book_list")
 
 @login_required
+def edit_book(request, book_id):
+    """Редактирование уже добавленной книги."""
+    book = get_object_or_404(Book, id=book_id, user=request.user)
+
+    if request.method == "POST":
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            book = form.save(commit=False)
+
+            # Обрабатываем даты, если они пустые
+            start_reading = request.POST.get("start_reading")
+            end_reading = request.POST.get("end_reading")
+
+            try:
+                book.start_reading = datetime.strptime(start_reading, "%Y-%m-%d") if start_reading else None
+                book.end_reading = datetime.strptime(end_reading, "%Y-%m-%d") if end_reading else None
+            except ValueError:
+                book.start_reading = None
+                book.end_reading = None
+
+            book.save()
+            return redirect("book_list")
+    else:
+        form = BookForm(instance=book)
+
+    return render(request, "diary/edit_book.html", {"form": form, "cover": book.cover_url, "book": book})
+
+
+@login_required
 def edit_book_from_api(request):
     """Позволяет редактировать книгу перед добавлением из Open Library API."""
     title = request.GET.get("title", "")
     author = request.GET.get("author", "")
     year = request.GET.get("year", "")
     cover = request.GET.get("cover", "")  # Обложка передаётся, но не запрашивается у пользователя
+
+    # Проверка на существование книги с таким названием и автором
+    existing_book = Book.objects.filter(name=title, author=author).first()
+    if existing_book:
+        # Если книга уже существует в базе данных
+        return redirect('book_list')
 
     if request.method == "POST":
         form = BookForm(request.POST)

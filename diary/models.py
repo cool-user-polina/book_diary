@@ -50,6 +50,8 @@ class Book(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     isbn = models.CharField(max_length=13, unique=True, null=True, blank=True)
     cover_url = models.URLField(null=True, blank=True)
+    file = models.FileField(upload_to='book_files/', null=True, blank=True)  # 📂 Поле для файлов книг
+
 
     def __str__(self):
         return f"{self.name} by {self.author}"

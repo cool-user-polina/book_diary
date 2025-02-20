@@ -12,35 +12,41 @@
 <a href="{% url 'book_create' %}" class="btn btn-success mb-3">➕ Добавить книгу</a>
 
 <div class="bookshelf">
-  <h3>📚 Мои книги</h3>
-  {% if books %}
-    <div class="book-row"> <!-- Открываем первый ряд -->
-    {% for book in books %}
-      <div class="book-card" style="background-color: {{ colors|random }};">
-        <div class="book-cover">
-          <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги">
-        </div>
-        <div class="book-info">
-          <h5>{{ book.name }}</h5>
-          <p class="mb-1 text-muted book-author">{{ book.author }}</p>
-          <small class="text-muted">{{ book.get_genre_display }}</small>
-        </div>
-        <div class="book-actions">
-          <a href="{% url 'book_detail' book.pk %}" class="btn btn-info">👁️</a>
+  <div class="bookshelf">
+    <h3>📚 Мои книги</h3>
+    {% if books %}
+      <div class="book-row"> <!-- Открываем первый ряд -->
+      {% for book in books %}
+        <div class="book-card" style="background-color: {{ colors|random }};">
+          <!-- Переносим кнопку удаления наверх -->
+          <div class="book-actions">
           <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️</a>
+          </div>
+  
+          <!-- Ссылка, которая охватывает всю карточку, делает её невидимой, но кликабельной -->
+          <a href="{% url 'book_detail' book.pk %}" class="book-link">
+            <div class="book-cover">
+              <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги">
+            </div>
+            <div class="book-info">
+              <h5>{{ book.name }}</h5>
+              <p class="mb-1 text-muted book-author">{{ book.author }}</p>
+              <small class="text-muted">{{ book.get_genre_display }}</small>
+            </div>
+          </a>
         </div>
-      </div>
-
-      {% if forloop.counter|divisibleby:3 and not forloop.last %}
-        </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
-      {% endif %}
-      
-    {% endfor %}
-    </div> <!-- Закрываем последний ряд -->
-  {% else %}
-    <p class="text-center">Вы еще не добавили книги.</p>
-  {% endif %}
-</div>
+  
+        {% if forloop.counter|divisibleby:3 and not forloop.last %}
+          </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
+        {% endif %}
+        
+      {% endfor %}
+      </div> <!-- Закрываем последний ряд -->
+    {% else %}
+      <p class="text-center">Вы еще не добавили книги.</p>
+    {% endif %}
+  </div>
+  
 
 <!-- Раздел с книгами из Open Library API -->
 {% if api_books %}
@@ -49,25 +55,18 @@
   <div class="book-row">
     {% for book in api_books %}
       <div class="book-card" style="background-color: {{ colors|random }};">
-        <div class="book-cover">
-          <img src="{{ book.cover }}" alt="Обложка книги">
-        </div>
-        <div class="book-info">
-          <h5>{{ book.title }}</h5>
-          <p class="mb-1 text-muted book-author">{{ book.author }}</p>
-        </div>
         <div class="book-actions">
-            <form method="POST" action="{% url 'add_book_from_api' %}">
-                {% csrf_token %}
-                <input type="hidden" name="title" value="{{ book.title }}">
-                <input type="hidden" name="author" value="{{ book.author }}">
-                <input type="hidden" name="cover" value="{{ book.cover }}">
-                <input type="hidden" name="year" value="{{ book.year }}">
-                <button type="submit" class="btn btn-primary">➕ Добавить</button>
-            </form>
-            <a href="{% url 'edit_book_from_api' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}&year={{ book.year|urlencode }}&cover={{ book.cover|urlencode }}" 
-               class="btn btn-warning">✏️ Редактировать</a>
+          <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️</a>
         </div>
+        <a href="{% url 'book_detail' book.pk %}" class="book-link">
+          <div class="book-cover">
+            <img src="{{ book.cover }}" alt="Обложка книги">
+          </div>
+          <div class="book-info">
+            <h5>{{ book.title }}</h5>
+            <p class="mb-1 text-muted book-author">{{ book.author }}</p>
+          </div>
+        </a>
       </div>
       {% if forloop.counter|divisibleby:3 %}
         </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
