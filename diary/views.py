@@ -58,29 +58,33 @@ def search_books(query):
 
 @login_required
 def book_list(request):
-    query = request.GET.get('q', '')  # Получаем поисковый запрос
-    books = Book.objects.filter(user=request.user)  # Книги пользователя
-    api_books = []  # Книги из Open Library API
+    query = request.GET.get('q', '')
+    books = Book.objects.filter(user=request.user)
+    api_books = []
+    colors = ['#3E2723', '#5A7D5A', '#797444', '#643811', '#a46572']
 
     if query:
-        # Фильтр по базе данных
+        # Поиск по локальной базе данных
         books = books.filter(Q(name__icontains=query) | Q(author__icontains=query))
+        
+        # Поиск в OpenLibrary только если в локальной БД ничего не найдено
+        if not books.exists():
+            api_url = f"https://openlibrary.org/search.json?q={query}"
+            try:
+                response = requests.get(api_url)
+                if response.status_code == 200:
+                    data = response.json()
+                    for doc in data.get('docs', [])[:20]:
+                        api_books.append({
+                            'title': doc.get('title', 'Без названия'),
+                            'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
+                            'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150",
+                            'year': doc.get('first_publish_year', '')
+                        })
+            except requests.RequestException:
+                # Обработка ошибок при запросе к API
+                pass
 
-        # Запрос в Open Library API
-        api_url = f"https://openlibrary.org/search.json?q={query}"
-        response = requests.get(api_url)
-
-        if response.status_code == 200:
-            data = response.json()
-            for doc in data.get('docs', [])[:20]:  # Берем первые 5 книг из результата
-                api_books.append({
-                    'title': doc.get('title', 'Без названия'),
-                    'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
-                    'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150"
-                })
-
-    colors = ['#3E2723', '#5A7D5A', '#797444', '#643811', '#a46572']
-    
     return render(request, 'diary/book_list.html', {
         'books': books,
         'api_books': api_books,
@@ -91,13 +95,11 @@ def book_list(request):
 @login_required
 def book_create(request):
     if request.method == 'POST':
-        form = BookForm(request.POST)
-        print('before validation')
-        for field in form:
-            print(f"Field {field.name}  Error: {field.errors}")
+        form = BookForm(request.POST,  request.FILES)
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user  # Привязываем книгу к пользователю
+            book.extract_cover()
             book.save()
             return redirect('book_list')
     else:

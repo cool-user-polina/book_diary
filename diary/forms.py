@@ -18,9 +18,10 @@ class CustomLoginForm(AuthenticationForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['author', 'name', 'genre', 'year', 'impression']
+        fields = ['author', 'name', 'genre', 'year', 'impression','cover_url', 'file']
         widgets = {
             'year': forms.NumberInput(attrs={'min': 0, 'max': 2100}),
             'start_reading': forms.DateInput(attrs={'type': 'date'}),
             'end_reading': forms.DateInput(attrs={'type': 'date'}),
+            'file': forms.ClearableFileInput(attrs={'class': 'form-control-file'})
         }
