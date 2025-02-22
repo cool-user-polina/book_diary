@@ -9,6 +9,7 @@ import requests
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from datetime import datetime 
+from django.db.models.functions import Lower
 
 # Регистрация
 def register(request):
@@ -64,26 +65,29 @@ def book_list(request):
     colors = ['#3E2723', '#5A7D5A', '#797444', '#643811', '#a46572']
 
     if query:
-        # Поиск по локальной базе данных
-        books = books.filter(Q(name__icontains=query) | Q(author__icontains=query))
+        # Используем Lower для преобразования к нижнему регистру при поиске
+        books = books.filter(
+            Q(name__icontains=query) |
+            Q(author__icontains=query) |
+            Q(name__iregex=query) |  # Добавляем поиск по регулярным выражениям
+            Q(author__iregex=query)
+        ).distinct()
         
-        # Поиск в OpenLibrary только если в локальной БД ничего не найдено
-        if not books.exists():
-            api_url = f"https://openlibrary.org/search.json?q={query}"
-            try:
-                response = requests.get(api_url)
-                if response.status_code == 200:
-                    data = response.json()
-                    for doc in data.get('docs', [])[:20]:
-                        api_books.append({
-                            'title': doc.get('title', 'Без названия'),
-                            'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
-                            'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150",
-                            'year': doc.get('first_publish_year', '')
-                        })
-            except requests.RequestException:
-                # Обработка ошибок при запросе к API
-                pass
+        # Параллельный поиск в OpenLibrary
+        api_url = f"https://openlibrary.org/search.json?q={query}"
+        try:
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                data = response.json()
+                for doc in data.get('docs', [])[:20]:
+                    api_books.append({
+                        'title': doc.get('title', 'Без названия'),
+                        'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
+                        'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150",
+                        'year': doc.get('first_publish_year', '')
+                    })
+        except requests.RequestException:
+            pass
 
     return render(request, 'diary/book_list.html', {
         'books': books,
