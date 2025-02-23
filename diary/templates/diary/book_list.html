@@ -14,7 +14,7 @@
 <div class="bookshelf">
   <h3>📚 Мои книги</h3>
   {% if books %}
-    <div class="book-row"> <!-- Открываем первый ряд -->
+    <div class="books-grid">
     {% for book in books %}
       <div class="book-card" style="background-color: {{ colors|random }};">
         <!-- Переносим кнопку удаления наверх -->
@@ -42,13 +42,8 @@
           </div>
         </a>
       </div>
-
-      {% if forloop.counter|divisibleby:3 and not forloop.last %}
-        </div><div class="book-row"> <!-- Закрываем текущий ряд и открываем новый -->
-      {% endif %}
-      
     {% endfor %}
-    </div> <!-- Закрываем последний ряд -->
+    </div>
   {% else %}
     <p class="text-center">Вы еще не добавили книги.</p>
   {% endif %}

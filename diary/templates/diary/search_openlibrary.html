@@ -1,0 +1,17 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<h1 class="text-center">Поиск книг</h1>
+
+<!-- Форма поиска -->
+<form method="GET" action="{% url 'search_openlibrary' %}" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Введите название или автора">
+        <button type="submit" class="btn btn-primary">🔍 Поиск</button>
+    </div>
+</form>
+
+<!-- Результаты поиска -->
+{% include 'diary/openlibrary_results.html' %}
+
+{% endblock %} 

@@ -38,6 +38,7 @@ urlpatterns = [
     path('books/', book_list, name='book_list'),
     path('books/<int:book_id>/', book_detail, name='book_detail'),  # Страница просмотра книги
     path('books/edit/<int:book_id>/', edit_book, name='edit_book'),
+    path('search/', diary_views.search_openlibrary, name='search_openlibrary'),
 ]
 
 if settings.DEBUG:

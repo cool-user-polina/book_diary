@@ -243,3 +243,31 @@ def edit_book_from_api(request):
         })
 
     return render(request, "diary/edit_book.html", {"form": form, "cover": cover})
+
+@login_required
+def search_openlibrary(request):
+    query = request.GET.get('q', '')
+    api_books = []
+    colors = ['#5A7D5A', '#797444', '#a46572']
+
+    if query:
+        api_url = f"https://openlibrary.org/search.json?q={query}"
+        try:
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                data = response.json()
+                for doc in data.get('docs', [])[:20]:
+                    api_books.append({
+                        'title': doc.get('title', 'Без названия'),
+                        'author': ', '.join(doc.get('author_name', ['Неизвестный автор'])),
+                        'cover': f"https://covers.openlibrary.org/b/olid/{doc.get('cover_edition_key', '')}-M.jpg" if doc.get('cover_edition_key') else "https://via.placeholder.com/150",
+                        'year': doc.get('first_publish_year', '')
+                    })
+        except requests.RequestException:
+            pass
+
+    return render(request, 'diary/search_openlibrary.html', {
+        'api_books': api_books,
+        'query': query,
+        'colors': colors
+    })
