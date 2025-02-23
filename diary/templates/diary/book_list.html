@@ -19,7 +19,7 @@
       <div class="book-card" style="background-color: {{ colors|random }};">
         <!-- Переносим кнопку удаления наверх -->
         <div class="book-actions">
-          <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️</a>
+        
           {% if book.file %}
             <p>📂 <a href="{{ book.file.url }}" download>Скачать книгу</a></p>
           {% endif %}

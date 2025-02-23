@@ -167,7 +167,4 @@ h1 {
     border: 2px solid var(--danger-color);
 }
 
-.book-actions .btn-danger:hover {
-    background-color: #8e2128;
-    border: 2px solid #8e2128;
-}
+

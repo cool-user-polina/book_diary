@@ -62,7 +62,7 @@ def book_list(request):
     query = request.GET.get('q', '')
     books = Book.objects.filter(user=request.user)
     api_books = []
-    colors = ['#3E2723', '#5A7D5A', '#797444', '#643811', '#a46572']
+    colors = [ '#5A7D5A', '#797444', '#a46572']
 
     if query:
         # Используем Lower для преобразования к нижнему регистру при поиске
