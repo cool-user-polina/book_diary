@@ -148,25 +148,25 @@ def book_delete(request, pk):
     return render(request, 'diary/book_confirm_delete.html', {'book': book})
 
 
-@login_required
-def add_book_from_api(request):
-    if request.method == "POST":
-        title = request.POST.get("title")
-        author = request.POST.get("author")
-        cover_url = request.POST.get("cover")
-        year = request.POST.get("year")  # Добавляем получение года
+# @login_required
+# def add_book_from_api(request):
+#     if request.method == "POST":
+#         title = request.POST.get("title")
+#         author = request.POST.get("author")
+#         cover_url = request.POST.get("cover")
+#         year = request.POST.get("year")  # Добавляем получение года
 
-        # Если год не передан, задаем значение по умолчанию (например, 0 или None)
-        year = int(year) if year else None  
+#         # Если год не передан, задаем значение по умолчанию (например, 0 или None)
+#         year = int(year) if year else None  
 
 
-        # Создаем объект книги
-        book = Book.objects.create(name=title, author=author, cover_url=cover_url, year=year, user=request.user)
+#         # Создаем объект книги
+#         book = Book.objects.create(name=title, author=author, cover_url=cover_url, year=year, user=request.user)
 
-        return redirect("book_list")
+#         return redirect("book_list")
         
 
-    return redirect("book_list")
+#     return redirect("book_list")
 
 @login_required
 def edit_book(request, book_id):
@@ -256,6 +256,7 @@ def search_openlibrary(request):
             response = requests.get(api_url)
             if response.status_code == 200:
                 data = response.json()
+                print(data)
                 for doc in data.get('docs', [])[:20]:
                     api_books.append({
                         'title': doc.get('title', 'Без названия'),

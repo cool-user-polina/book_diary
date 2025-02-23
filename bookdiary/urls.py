@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from diary import views as diary_views  # Импортируем наши view-функции
-from diary.views import add_book_from_api
+# from diary.views import add_book_from_api
 from diary.views import edit_book_from_api, edit_book, book_list, book_detail
 from django.conf import settings
 from django.conf.urls.static import static
@@ -33,7 +33,7 @@ urlpatterns = [
     path('books/<int:pk>/edit/', diary_views.book_edit, name='book_edit'),
     path('books/<int:pk>/delete/', diary_views.book_delete, name='book_delete'),
     path('books/<int:pk>/delete/confirm/', diary_views.book_delete_confirm, name='book_delete_confirm'),
-    path('add_book_from_api/', add_book_from_api, name='add_book_from_api'),
+    # path('add_book_from_api/', add_book_from_api, name='add_book_from_api'),
     path('edit-book/', edit_book_from_api, name='edit_book_from_api'),
     path('books/', book_list, name='book_list'),
     path('books/<int:book_id>/', book_detail, name='book_detail'),  # Страница просмотра книги
