@@ -57,8 +57,8 @@ class Book(models.Model):
     impression = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     isbn = models.CharField(max_length=13, unique=True, null=True, blank=True)
-    cover_url = models.ImageField(upload_to='book_covers/', null=True, blank=True)
     file = models.FileField(upload_to='book_files/', null=True, blank=True)
+    cover_image = models.ImageField(upload_to='book_covers/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} by {self.author}"
@@ -74,20 +74,15 @@ class Book(models.Model):
             elif ext == '.epub':
                 self._extract_epub_cover(file_path)
 
-    def _extract_pdf_cover(self, file_path):
-        """Извлекает обложку из PDF"""
-        images = convert_from_path(file_path, first_page=1, last_page=1)
-        if images:
-            image = images[0]
-            img_io = ContentFile(b'')
-            image.save(img_io, format='JPEG')
-            self.cover_image.save(f"{self.pk}_cover.jpg", img_io, save=True)
 
-    def _extract_epub_cover(self, file_path):
-        """Извлекает обложку из EPUB"""
-        book = epub.read_epub(file_path)
-        for item in book.items:
-            if item.get_type() == epub.ITEM_COVER:
-                img_io = ContentFile(item.content)
-                self.cover_image.save(f"{self.pk}_cover.jpg", img_io, save=True)
-                break
+    def save(self, *args, **kwargs):
+        if not self.pk and self.cover_image:
+            super().save(*args, **kwargs)
+            
+            img = Image.open(self.cover_image.path)
+            
+            max_size = (800, 1200)
+            img.thumbnail(max_size, Image.LANCZOS)
+            img.save(self.cover_image.path)
+        else:
+            super().save(*args, **kwargs)

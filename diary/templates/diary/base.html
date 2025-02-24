@@ -28,8 +28,8 @@
                                href="{% url 'book_list' %}">📚 Мои книги</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'search_openlibrary' %}active{% endif %}" 
-                               href="{% url 'search_openlibrary' %}">🔍 Поиск книг</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'search_books' %}active{% endif %}" 
+                               href="{% url 'search_books' %}">🔍 Поиск книг</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active{% endif %}" 

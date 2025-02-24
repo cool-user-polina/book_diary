@@ -18,10 +18,25 @@ class CustomLoginForm(AuthenticationForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['author', 'name', 'genre', 'year', 'impression','cover_url', 'file']
+        fields = [
+            'author',
+            'name',
+            'genre',
+            'year',
+            'impression',
+            'start_reading',
+            'end_reading',
+            'cover_image',
+            'file'
+        ]
         widgets = {
-            'year': forms.NumberInput(attrs={'min': 0, 'max': 2100}),
-            'start_reading': forms.DateInput(attrs={'type': 'date'}),
-            'end_reading': forms.DateInput(attrs={'type': 'date'}),
-            'file': forms.ClearableFileInput(attrs={'class': 'form-control-file'})
+            'author': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'genre': forms.Select(attrs={'class': 'form-control'}),
+            'year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'impression': forms.Textarea(attrs={'class': 'form-control'}),
+            'start_reading': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_reading': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'cover_image': forms.FileInput(attrs={'class': 'form-control'}),
+            'file': forms.FileInput(attrs={'class': 'form-control'})
         }

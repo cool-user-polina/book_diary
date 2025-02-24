@@ -18,27 +18,27 @@ from django.contrib import admin
 from django.urls import path, include
 from diary import views as diary_views  # Импортируем наши view-функции
 # from diary.views import add_book_from_api
-from diary.views import edit_book_from_api, edit_book, book_list, book_detail
+from diary.views import (
+    register, custom_login, custom_logout, home,
+    book_list, book_create, book_delete, book_detail,
+    book_edit, search_books, edit_book_from_api
+)
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', diary_views.register, name='register'),  # Регистрация
-    path('login/', diary_views.custom_login, name='login'),    # Вход
-    path('logout/', diary_views.custom_logout, name='logout'), # Выход
-    path('', diary_views.home, name='home'),    
-    path('books/', diary_views.book_list, name='book_list'),
-    path('books/create/', diary_views.book_create, name='book_create'),
-    path('books/<int:pk>/edit/', diary_views.book_edit, name='book_edit'),
-    path('books/<int:pk>/delete/', diary_views.book_delete, name='book_delete'),
-    path('books/<int:pk>/delete/confirm/', diary_views.book_delete_confirm, name='book_delete_confirm'),
-    # path('add_book_from_api/', add_book_from_api, name='add_book_from_api'),
-    path('edit-book/', edit_book_from_api, name='edit_book_from_api'),
+    path('register/', register, name='register'),  # Регистрация
+    path('login/', custom_login, name='login'),    # Вход
+    path('logout/', custom_logout, name='logout'), # Выход
+    path('', home, name='home'),    
     path('books/', book_list, name='book_list'),
+    path('books/create/', book_create, name='book_create'),
+    path('books/<int:pk>/delete/', book_delete, name='book_delete'),
     path('books/<int:book_id>/', book_detail, name='book_detail'),  # Страница просмотра книги
-    path('books/edit/<int:book_id>/', edit_book, name='edit_book'),
-    path('search/', diary_views.search_openlibrary, name='search_openlibrary'),
+    path('books/<int:pk>/edit/', book_edit, name='book_edit'),
+    path('search/', search_books, name='search_books'),
+    path('edit-from-api/', edit_book_from_api, name='edit_book_from_api'),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,56 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<h1 class="text-center">Поиск книг</h1>
+
+<form method="GET" action="{% url 'search_books' %}" class="mb-4">
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text" 
+                   name="q" 
+                   id="query" 
+                   value="{{ query }}" 
+                   class="form-control" 
+                   placeholder="Введите название книги или автора">
+            <button type="submit" class="btn btn-primary">🔍 Найти</button>
+        </div>
+    </div>
+</form>
+
+{% if query %}
+    {% include 'diary/google_books_results.html' %}
+    
+    {% if pagination %}
+        <nav aria-label="Навигация по страницам" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ pagination.previous_page }}">
+                            &laquo; Назад
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for p in pagination.page_range %}
+                    <li class="page-item {% if p == pagination.current_page %}active{% endif %}">
+                        <a class="page-link" href="?q={{ query }}&page={{ p }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ pagination.next_page }}">
+                            Вперед &raquo;
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center text-muted mt-4">
+        <p>Введите название книги или имя автора для поиска</p>
+    </div>
+{% endif %}
+
+{% endblock %} 

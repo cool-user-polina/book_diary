@@ -4,9 +4,21 @@
 <div class="container">
     <h2 class="mb-4">{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} книгу</h2>
     
-    <form method="post" class="col-md-8">
+    <form method="post" enctype="multipart/form-data" class="col-md-8">
         {% csrf_token %}
         
+        <!-- Поле загрузки обложки -->
+        <div class="mb-3">
+            <label for="{{ form.cover_image.id_for_label }}" class="form-label">Обложка книги</label>
+            {{ form.cover_image }}
+            <small class="form-text text-muted">Загрузите изображение обложки (JPG, PNG)</small>
+            {% if form.cover_image.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.cover_image.errors }}
+                </div>
+            {% endif %}
+        </div>
+
         <!-- Поле "Автор" -->
         <div class="mb-3">
             <label for="{{ form.author.id_for_label }}" class="form-label">Автор*</label>

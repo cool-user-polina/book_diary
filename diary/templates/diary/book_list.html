@@ -1,46 +1,43 @@
 {% extends 'diary/base.html' %}
 
 {% block content %}
-<h1 class="text-center"> Моя книжная полка </h1>
+<h1 class="text-center">Моя книжная полка</h1>
 
 <!-- Форма поиска -->
 <form method="GET" action="{% url 'book_list' %}" class="mb-3">
-    <input type="text" name="q" value="{{ query }}" placeholder="Введите название или автора">
-    <button type="submit">🔍 Поиск</button>
+    <div class="input-group">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Поиск по моим книгам">
+        <button type="submit" class="btn btn-primary">🔍 Поиск</button>
+    </div>
 </form>
 
 <a href="{% url 'book_create' %}" class="btn btn-success mb-3">➕ Добавить книгу</a>
 
+<!-- Список книг пользователя -->
 <div class="bookshelf">
   <h3>📚 Мои книги</h3>
   {% if books %}
     <div class="books-grid">
     {% for book in books %}
       <div class="book-card" style="background-color: {{ colors|random }};">
-        <!-- Переносим кнопку удаления наверх -->
-        <div class="book-actions">
-        
-          {% if book.file %}
-            <p>📂 <a href="{{ book.file.url }}" download>Скачать книгу</a></p>
-          {% endif %}
-
-        </div>
-
-        <!-- Ссылка, которая охватывает всю карточку, делает её невидимой, но кликабельной -->
-        <a href="{% url 'book_detail' book.pk %}" class="book-link">
-          <div class="book-cover">
+        <div class="book-cover">
             {% if book.cover_image %}
-              <img src="{{ book.cover_image.url }}" alt="Обложка книги">
+                <img src="{{ book.cover_image.url }}" alt="Обложка книги">
             {% else %}
-              <img src="https://kniga.lv/icache/b99834bc/67860a1c/0359cbdd.jpg" alt="Обложка книги">
+                <img src="https://via.placeholder.com/150" alt="Нет обложки">
             {% endif %}
-          </div>
-          <div class="book-info">
+        </div>
+        <div class="book-info">
             <h5>{{ book.name }}</h5>
             <p class="mb-1 text-muted book-author">{{ book.author }}</p>
-            <small class="text-muted">{{ book.get_genre_display }}</small>
-          </div>
-        </a>
+            {% if book.year %}
+                <p class="mb-1 text-muted">{{ book.year }}</p>
+            {% endif %}
+        </div>
+        <div class="book-actions">
+            <a href="{% url 'book_edit' book.id %}" class="btn btn-sm btn-primary">✏️</a>
+            <a href="{% url 'book_delete' book.id %}" class="btn btn-sm btn-danger">🗑️</a>
+        </div>
       </div>
     {% endfor %}
     </div>
@@ -48,8 +45,5 @@
     <p class="text-center">Вы еще не добавили книги.</p>
   {% endif %}
 </div>
-
-<!-- Подключаем результаты поиска OpenLibrary -->
-{% include 'diary/openlibrary_results.html' %}
 
 {% endblock %}

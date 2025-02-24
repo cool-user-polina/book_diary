@@ -1,12 +1,13 @@
 {% if api_books %}
 <div class="bookshelf">
-    <h3>🌍 Найдено в Open Library</h3>
-    <div class="book-row">
+    <h3>📚 Найдено в Google Books</h3>
+    <div class="books-grid">
         {% for book in api_books %}
         <div class="book-card" style="background-color: {{ colors|random }};">
             <form action="{% url 'edit_book_from_api' %}" method="GET" class="book-actions">
                 <input type="hidden" name="title" value="{{ book.title }}">
                 <input type="hidden" name="author" value="{{ book.author }}">
+                <input type="hidden" name="year" value="{{ book.year }}">
                 <input type="hidden" name="cover" value="{{ book.cover }}">
                 <button type="submit" class="btn btn-success">➕ Добавить</button>
             </form>
@@ -16,12 +17,22 @@
             <div class="book-info">
                 <h5>{{ book.title }}</h5>
                 <p class="mb-1 text-muted book-author">{{ book.author }}</p>
+                {% if book.year %}
+                    <p class="mb-1 text-muted">{{ book.year }}</p>
+                {% endif %}
+                {% if book.categories %}
+                    <p class="mb-1 text-muted small">{{ book.categories|join:", " }}</p>
+                {% endif %}
+                {% if book.preview_link %}
+                    <a href="{{ book.preview_link }}" target="_blank" class="btn btn-sm btn-info mt-2">
+                        👁 Предпросмотр
+                    </a>
+                {% endif %}
             </div>
         </div>
-        {% if forloop.counter|divisibleby:3 and not forloop.last %}
-        </div><div class="book-row">
-        {% endif %}
         {% endfor %}
     </div>
 </div>
+{% elif query %}
+<p class="text-center">По вашему запросу ничего не найдено.</p>
 {% endif %} 
