@@ -1,38 +1,33 @@
 {% if api_books %}
-<div class="bookshelf">
-    <h3>📚 Найдено в Google Books</h3>
-    <div class="books-grid">
-        {% for book in api_books %}
-        <div class="book-card" style="background-color: {{ colors|random }};">
-            <form action="{% url 'edit_book_from_api' %}" method="GET" class="book-actions">
-                <input type="hidden" name="title" value="{{ book.title }}">
-                <input type="hidden" name="author" value="{{ book.author }}">
-                <input type="hidden" name="year" value="{{ book.year }}">
-                <input type="hidden" name="cover" value="{{ book.cover }}">
-                <button type="submit" class="btn btn-success">➕ Добавить</button>
-            </form>
-            <div class="book-cover">
-                <img src="{{ book.cover }}" alt="Обложка книги">
-            </div>
-            <div class="book-info">
-                <h5>{{ book.title }}</h5>
-                <p class="mb-1 text-muted book-author">{{ book.author }}</p>
-                {% if book.year %}
-                    <p class="mb-1 text-muted">{{ book.year }}</p>
-                {% endif %}
-                {% if book.categories %}
-                    <p class="mb-1 text-muted small">{{ book.categories|join:", " }}</p>
-                {% endif %}
-                {% if book.preview_link %}
-                    <a href="{{ book.preview_link }}" target="_blank" class="btn btn-sm btn-info mt-2">
-                        👁 Предпросмотр
-                    </a>
-                {% endif %}
-            </div>
+<div class="books-grid">
+    {% for book in api_books %}
+    <div class="book-card">
+        <div class="book-cover">
+            <img src="{{ book.cover }}" alt="{{ book.title }}">
         </div>
-        {% endfor %}
+        <div class="book-info">
+            <h5>{{ book.title }}</h5>
+            <p class="book-author">{{ book.author }}</p>
+            {% if book.year %}
+                <p class="book-year">{{ book.year }}</p>
+            {% endif %}
+        </div>
+        <div class="book-actions">
+            <a href="{% url 'edit_book_from_api' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}&year={{ book.year|urlencode }}&cover={{ book.cover|urlencode }}" 
+               class="btn btn-primary" 
+               title="Добавить книгу">
+                <svg class="add-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                </svg>
+            </a>
+        </div>
     </div>
+    {% endfor %}
 </div>
-{% elif query %}
-<p class="text-center">По вашему запросу ничего не найдено.</p>
+{% else %}
+    {% if query %}
+        <div class="empty-list">
+            <p>По вашему запросу ничего не найдено</p>
+        </div>
+    {% endif %}
 {% endif %} 
