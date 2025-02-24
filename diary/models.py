@@ -59,6 +59,13 @@ class Book(models.Model):
     isbn = models.CharField(max_length=13, unique=True, null=True, blank=True)
     file = models.FileField(upload_to='book_files/', null=True, blank=True)
     cover_image = models.ImageField(upload_to='book_covers/', null=True, blank=True)
+    rating = models.IntegerField(null=True, blank=True, choices=[
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5')
+    ])
 
     def __str__(self):
         return f"{self.name} by {self.author}"

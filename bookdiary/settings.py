@@ -127,3 +127,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'diary.User'
+
+# URL для перенаправления неавторизованных пользователей
+LOGIN_URL = 'login'  # Используем имя URL-шаблона для страницы входа

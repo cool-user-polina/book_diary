@@ -1,0 +1,71 @@
+/* Стили для рейтинга в форме */
+.rating {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    padding: 10px 0;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    cursor: pointer;
+    font-size: 30px;
+    color: #ddd;
+    transition: color 0.2s;
+    user-select: none;
+}
+
+/* Цвет для активных звезд */
+.rating input:checked + label,
+.rating input:checked ~ label {
+    color: #ffd700;
+}
+
+/* Цвет при наведении */
+.rating:hover label {
+    color: #ddd;
+}
+
+.rating:hover label:hover,
+.rating:hover label:hover ~ label {
+    color: #ffd700;
+}
+
+/* Стили для отображения рейтинга в списке книг */
+.rating-display {
+    display: flex;
+    gap: 2px;
+    margin-top: 5px;
+}
+
+.rating-display .star {
+    font-size: 18px;
+    color: #ddd;
+    line-height: 1;
+}
+
+.rating-display .star.filled {
+    color: #ffd700;
+}
+
+.book-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+}
+
+.modal-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+.book-actions {
+    position: relative;
+    z-index: 2;
+} 

@@ -28,7 +28,7 @@
   {% if books %}
     <div class="books-grid">
     {% for book in books %}
-      <div class="book-card" style="background-color: {{ colors|random }};">
+      <div class="book-card" style="background-color: {{ colors|random }};" data-bs-toggle="modal" data-bs-target="#bookModal{{ book.id }}">
         <div class="book-cover">
             {% if book.cover_image %}
                 <img src="{{ book.cover_image.url }}" alt="Обложка книги">
@@ -42,18 +42,100 @@
             {% if book.year %}
                 <p class="mb-1 text-muted">{{ book.year }}</p>
             {% endif %}
+            <!-- Отображение рейтинга звездочками -->
+            <div class="rating-display">
+                {% with ''|center:5 as range %}
+                {% for _ in range %}
+                    <span class="star {% if forloop.counter <= book.rating|default:0 %}filled{% endif %}">★</span>
+                {% endfor %}
+                {% endwith %}
+            </div>
         </div>
         <div class="book-actions">
-            <a href="{% url 'book_edit' book.id %}" class="btn btn-sm btn-primary" title="Редактировать">
+            <a href="{% url 'book_edit' book.id %}" class="btn btn-sm btn-primary" title="Редактировать" onclick="event.stopPropagation();">
                 <svg class="edit-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75 1.84-1.83zM3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z" fill="currentColor"/>
                 </svg>
             </a>
-            <a href="{% url 'book_delete' book.id %}" class="btn btn-sm btn-danger" title="Удалить">
+            <button class="btn btn-sm btn-danger" title="Удалить" onclick="event.stopPropagation();" data-bs-toggle="modal" data-bs-target="#deleteModal{{ book.id }}">
                 <svg class="delete-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
                 </svg>
-            </a>
+            </button>
+        </div>
+      </div>
+
+      <!-- Модальное окно для каждой книги -->
+      <div class="modal fade" id="bookModal{{ book.id }}" tabindex="-1" aria-labelledby="bookModalLabel{{ book.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="bookModalLabel{{ book.id }}">{{ book.name }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-4">
+                  {% if book.cover_image %}
+                    <img src="{{ book.cover_image.url }}" alt="Обложка книги" class="img-fluid">
+                  {% else %}
+                    <img src="https://via.placeholder.com/150" alt="Нет обложки" class="img-fluid">
+                  {% endif %}
+                </div>
+                <div class="col-md-8">
+                  <p><strong>Автор:</strong> {{ book.author }}</p>
+                  {% if book.year %}
+                    <p><strong>Год издания:</strong> {{ book.year }}</p>
+                  {% endif %}
+                  <p><strong>Жанр:</strong> {{ book.get_genre_display }}</p>
+                  {% if book.start_reading %}
+                    <p><strong>Начало чтения:</strong> {{ book.start_reading }}</p>
+                  {% endif %}
+                  {% if book.end_reading %}
+                    <p><strong>Окончание чтения:</strong> {{ book.end_reading }}</p>
+                  {% endif %}
+                  <div class="rating-display mb-3">
+                    <strong>Рейтинг: </strong>
+                    {% with ''|center:5 as range %}
+                    {% for _ in range %}
+                        <span class="star {% if forloop.counter <= book.rating|default:0 %}filled{% endif %}">★</span>
+                    {% endfor %}
+                    {% endwith %}
+                  </div>
+                  {% if book.impression %}
+                    <p><strong>Впечатления:</strong></p>
+                    <p>{{ book.impression }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <a href="{% url 'book_edit' book.id %}" class="btn btn-primary">Редактировать</a>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Модальное окно для подтверждения удаления -->
+      <div class="modal fade" id="deleteModal{{ book.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ book.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel{{ book.id }}">Подтверждение удаления</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Вы действительно хотите удалить книгу "{{ book.name }}"?</p>
+            </div>
+            <div class="modal-footer">
+              <form action="{% url 'book_delete' book.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Удалить</button>
+              </form>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+          </div>
         </div>
       </div>
     {% endfor %}

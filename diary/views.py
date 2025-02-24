@@ -4,17 +4,11 @@ from django.contrib.auth import login, logout
 from .forms import RegistrationForm, CustomLoginForm, BookForm
 from django.contrib.auth.decorators import login_required
 from .models import Book
-from django.shortcuts import redirect  # Добавьте этот импорт
-from random import choice
-import requests
-from django.db.models import Q
 from datetime import datetime 
-from django.db.models.functions import Lower
-from functools import reduce
-from operator import or_
-from django.db.models import Q, Value
-from django.db.models.functions import Lower, Length
 from fuzzywuzzy import fuzz  # Добавьте: pip install fuzzywuzzy python-Levenshtein
+from urllib.parse import urlparse
+from django.urls import reverse
+from django.core.files.base import ContentFile
 
 # Регистрация
 def register(request):
@@ -35,7 +29,8 @@ def custom_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+            next_url = request.GET.get('next', 'home')
+            return redirect(next_url)
     else:
         form = CustomLoginForm()
     return render(request, 'diary/login.html', {'form': form})
@@ -68,13 +63,18 @@ def book_list(request):
             author_ratio = fuzz.partial_ratio(query, book.author.lower())
             return max(title_ratio, author_ratio)
 
-        # Фильтруем книги с порогом схожести > 60%
-        filtered_books = [book for book in all_books if calculate_similarity(book) > 60]
+        # Фильтруем и сортируем книги
+        filtered_books = []
+        for book in all_books:
+            similarity = calculate_similarity(book)
+            if similarity > 60:  # Порог схожести
+                filtered_books.append((book, similarity))
         
-        # Сортируем по степени схожести
-        filtered_books.sort(key=calculate_similarity, reverse=True)
+        # Сортируем по схожести
+        filtered_books.sort(key=lambda x: x[1], reverse=True)
         
-        books = filtered_books
+        # Извлекаем только книги, без значений схожести
+        books = [book for book, _ in filtered_books]
 
     return render(request, 'diary/book_list.html', {
         'books': books,
@@ -105,7 +105,7 @@ def book_delete(request, pk):
     if request.method == 'POST':
         book.delete()
         return redirect('book_list')
-    return render(request, 'diary/book_confirm_delete.html', {'book': book})
+    return redirect('book_list')
 
 @login_required
 def book_detail(request, book_id):
@@ -231,32 +231,38 @@ def edit_book_from_api(request):
     author = request.GET.get("author", "")
     year = request.GET.get("year", "")
     cover_url = request.GET.get("cover", "")
-
+    preview_link = request.GET.get("preview", "")
+    search_query = request.GET.get("search_query", "")
+    
     existing_book = Book.objects.filter(name=title, author=author).first()
     if existing_book:
-        return redirect('book_list')
+        return redirect(f"{reverse('search_books')}?q={search_query}")
 
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user
-
-            if 'cover_image' in request.FILES:
+            
+            if not request.FILES.get('cover_image') and cover_url:
+                try:
+                    response = requests.get(cover_url)
+                    if response.status_code == 200:
+                        file_name = urlparse(cover_url).path.split('/')[-1]
+                        extension = file_name.split('.')[-1] if '.' in file_name else 'jpg'
+                        image_name = f"{title[:30]}_{author[:30]}.{extension}"
+                        book.cover_image.save(
+                            image_name,
+                            ContentFile(response.content),
+                            save=False
+                        )
+                except Exception as e:
+                    print(f"Ошибка при загрузке обложки: {e}")
+            elif 'cover_image' in request.FILES:
                 book.cover_image = request.FILES['cover_image']
 
-            start_reading = request.POST.get("start_reading")
-            end_reading = request.POST.get("end_reading")
-
-            try:
-                book.start_reading = datetime.strptime(start_reading, "%Y-%m-%d") if start_reading else None
-                book.end_reading = datetime.strptime(end_reading, "%Y-%m-%d") if end_reading else None
-            except ValueError:
-                book.start_reading = None
-                book.end_reading = None
-
             book.save()
-            return redirect("book_list")
+            return redirect(f"{reverse('search_books')}?q={search_query}")
     else:
         form = BookForm(initial={
             "name": title,
@@ -266,5 +272,7 @@ def edit_book_from_api(request):
 
     return render(request, "diary/edit_book.html", {
         "form": form, 
-        "cover": cover_url
+        "cover": cover_url,
+        "preview_link": preview_link,
+        "search_query": search_query
     })

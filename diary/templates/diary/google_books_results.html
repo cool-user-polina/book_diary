@@ -13,7 +13,7 @@
             {% endif %}
         </div>
         <div class="book-actions">
-            <a href="{% url 'edit_book_from_api' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}&year={{ book.year|urlencode }}&cover={{ book.cover|urlencode }}" 
+            <a href="{% url 'edit_book_from_api' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}&year={{ book.year|urlencode }}&cover={{ book.cover|urlencode }}&search_query={{ query|urlencode }}" 
                class="btn btn-primary" 
                title="Добавить книгу">
                 <svg class="add-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
