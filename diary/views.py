@@ -4,11 +4,15 @@ from django.contrib.auth import login, logout
 from .forms import RegistrationForm, CustomLoginForm, BookForm
 from django.contrib.auth.decorators import login_required
 from .models import Book
-from datetime import datetime 
+from datetime import datetime, date
 from fuzzywuzzy import fuzz  # Добавьте: pip install fuzzywuzzy python-Levenshtein
 from urllib.parse import urlparse
 from django.urls import reverse
 from django.core.files.base import ContentFile
+import calendar
+from collections import defaultdict
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 
 # Регистрация
 def register(request):
@@ -276,3 +280,82 @@ def edit_book_from_api(request):
         "preview_link": preview_link,
         "search_query": search_query
     })
+
+@login_required
+def book_calendar(request):
+    # Получаем текущую дату или из параметров запроса
+    current_date = datetime.now()
+    year = int(request.GET.get('year', current_date.year))
+    month = int(request.GET.get('month', current_date.month))
+
+    # Создаем календарь
+    cal = calendar.monthcalendar(year, month)
+    
+    # Получаем первый и последний день месяца
+    start_date = datetime(year, month, 1)
+    if month == 12:
+        end_date = datetime(year + 1, 1, 1)
+    else:
+        end_date = datetime(year, month + 1, 1)
+    
+    # Получаем все книги за месяц
+    books = Book.objects.filter(
+        user=request.user,
+        end_reading__isnull=False,
+        end_reading__gte=start_date,
+        end_reading__lt=end_date
+    )
+
+    # Создаем словарь с количеством книг по датам
+    books_count = defaultdict(int)
+    for book in books:
+        if book.end_reading:
+            books_count[book.end_reading.day] += 1
+
+    # Формируем данные для шаблона
+    calendar_data = []
+    today = date.today()
+    
+    for week in cal:
+        week_data = []
+        for day in week:
+            if day != 0:
+                current_date = date(year, month, day)
+                week_data.append({
+                    'date': current_date,
+                    'books_count': books_count[day],
+                    'today': current_date == today
+                })
+            else:
+                week_data.append({'date': None})
+        calendar_data.append(week_data)
+
+    # Получаем названия месяцев
+    month_names = {
+        1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель',
+        5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август',
+        9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'
+    }
+
+    # Вычисляем предыдущий и следующий месяцы
+    if month == 1:
+        prev_month, prev_year = 12, year - 1
+    else:
+        prev_month, prev_year = month - 1, year
+
+    if month == 12:
+        next_month, next_year = 1, year + 1
+    else:
+        next_month, next_year = month + 1, year
+
+    context = {
+        'calendar_data': calendar_data,
+        'current_month_name': month_names[month],
+        'current_year': year,
+        'prev_month': prev_month,
+        'prev_year': prev_year,
+        'next_month': next_month,
+        'next_year': next_year
+    }
+
+    return render(request, 'diary/book_calendar.html', context)

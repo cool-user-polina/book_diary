@@ -1,0 +1,59 @@
+{% extends 'diary/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Календарь прочитанных книг</h2>
+    
+    <div class="row mb-3">
+        <div class="col">
+            <h3>{{ current_month_name }} {{ current_year }}</h3>
+        </div>
+        <div class="col-auto">
+            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-outline-primary">&larr;</a>
+            <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-outline-primary">&rarr;</a>
+        </div>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="calendar-header">
+            <div>Пн</div>
+            <div>Вт</div>
+            <div>Ср</div>
+            <div>Чт</div>
+            <div>Пт</div>
+            <div>Сб</div>
+            <div>Вс</div>
+        </div>
+        
+        {% for week in calendar_data %}
+        <div class="calendar-week">
+            {% for day in week %}
+                {% if day.date %}
+                    <div class="calendar-day {% if day.today %}today{% endif %}" 
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="top" 
+                         title="Прочитано книг: {{ day.books_count }}">
+                        <span class="date">{{ day.date.day }}</span>
+                        {% if day.books_count > 0 %}
+                            <span class="badge bg-success">{{ day.books_count }}</span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="calendar-day empty"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Добавляем инициализацию тултипов Bootstrap -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
+</script>
+{% endblock %} 
