@@ -3,14 +3,46 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Календарь прочитанных книг</h2>
-    
-    <div class="row mb-3">
-        <div class="col">
-            <h3>{{ current_month_name }} {{ current_year }}</h3>
+
+    <!-- Блок статистики -->
+    <div class="stats-container mb-5">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <h3>{{ total_books }}</h3>
+                    <p>Всего книг прочитано</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-content">
+                    <h3>{{ books_this_month }}</h3>
+                    <p>Книг за этот месяц</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                    <h3>{{ avg_rating|floatformat:1 }}</h3>
+                    <p>Средний рейтинг</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                    <h3>{{ most_read_genre }}</h3>
+                    <p>Любимый жанр</p>
+                </div>
+            </div>
         </div>
-        <div class="col-auto">
-            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-outline-primary">&larr;</a>
-            <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-outline-primary">&rarr;</a>
+    </div>
+    
+    <div class="calendar-nav">
+        <div class="btn-group">
+            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-outline-primary">&larr; Предыдущий</a>
+            <h3>{{ current_month_name }} {{ current_year }}</h3>
+            <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-outline-primary">Следующий &rarr;</a>
         </div>
     </div>
 
@@ -30,14 +62,57 @@
             {% for day in week %}
                 {% if day.date %}
                     <div class="calendar-day {% if day.today %}today{% endif %}" 
-                         data-bs-toggle="tooltip" 
-                         data-bs-placement="top" 
-                         title="Прочитано книг: {{ day.books_count }}">
+                         data-bs-toggle="modal"
+                         data-bs-target="#dayModal{{ day.date|date:'Ymd' }}"
+                         {% if day.books_count > 0 %}style="cursor: pointer;"{% endif %}>
                         <span class="date">{{ day.date.day }}</span>
                         {% if day.books_count > 0 %}
                             <span class="badge bg-success">{{ day.books_count }}</span>
                         {% endif %}
                     </div>
+                    
+                    <!-- Модальное окно для каждого дня с книгами -->
+                    {% if day.books_count > 0 %}
+                    <div class="modal fade" id="dayModal{{ day.date|date:'Ymd' }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Книги, прочитанные {{ day.date|date:"d.m.Y" }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="day-books-grid">
+                                        {% for book in day.books %}
+                                            <div class="day-book-card">
+                                                <div class="book-cover">
+                                                    {% if book.cover_image %}
+                                                        <img src="{{ book.cover_image.url }}" alt="Обложка книги">
+                                                    {% else %}
+                                                        <img src="https://via.placeholder.com/150" alt="Нет обложки">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="book-info">
+                                                    <h5>{{ book.name }}</h5>
+                                                    <p class="author">{{ book.author }}</p>
+                                                    <div class="rating">
+                                                        {% with ''|center:5 as range %}
+                                                        {% for _ in range %}
+                                                            <span class="star {% if forloop.counter <= book.rating|default:0 %}filled{% endif %}">★</span>
+                                                        {% endfor %}
+                                                        {% endwith %}
+                                                    </div>
+                                                    {% if book.impression %}
+                                                        <p class="impression">{{ book.impression }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 {% else %}
                     <div class="calendar-day empty"></div>
                 {% endif %}

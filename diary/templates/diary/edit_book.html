@@ -1,4 +1,5 @@
 {% extends 'diary/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="container">
@@ -12,9 +13,42 @@
         <img src="{{ cover }}" alt="Обложка книги" class="img-fluid" style="max-width: 200px;">
     </div>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <!-- Рейтинг звездочками -->
+        <div class="mb-3">
+            <label class="form-label">Рейтинг</label>
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                <span class="star {% if form.instance.rating >= forloop.counter %}active{% endif %}" 
+                      data-rating="{{ forloop.counter }}">★</span>
+                {% endfor %}
+            </div>
+            {{ form.rating }}
+        </div>
+
+        {% for field in form %}
+            {% if field.name != 'rating' %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {% if field.name == 'genre' %}
+                    {{ field|add_class:"form-control" }}  <!-- Поле выбора жанра -->
+                {% elif field.field.widget.input_type == 'file' %}
+                    {% if form.instance.cover_image %}
+                        <p>Текущая обложка: {{ form.instance.cover_image.name }}</p>
+                    {% endif %}
+                    {{ field }}
+                {% else %}
+                    {{ field|add_class:"form-control" }}
+                {% endif %}
+                {{ field.errors }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
 
         <label>Дата начала чтения:</label>
         <input type="date" name="start_reading" value="{{ form.start_reading.value|default:'' }}">
@@ -53,6 +87,25 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector("form").onsubmit = function() {
         document.querySelector("textarea[name='impression']").value = quill.root.innerHTML;
     };
+
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.querySelector('input[name="rating"]');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            ratingInput.value = rating;
+            
+            // Обновляем активные звезды
+            stars.forEach(s => {
+                if (s.getAttribute('data-rating') <= rating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

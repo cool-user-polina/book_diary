@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.core.files.base import ContentFile
 import calendar
 from collections import defaultdict
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.db.models.functions import TruncDate
 
 # Регистрация
@@ -46,10 +46,18 @@ def custom_logout(request):
 
 # Главная страница
 def home(request):
-    if not request.user.is_authenticated:
-        return redirect('login') 
-    else: 
-        return redirect('book_list')
+    context = {
+        'popular_books': Book.objects.all().order_by('-rating')[:6],
+    }
+    
+    if request.user.is_authenticated:
+        user_books = Book.objects.filter(user=request.user)
+        context.update({
+            'total_books': user_books.count(),
+            'avg_rating': user_books.aggregate(Avg('rating'))['rating__avg'] or 0,
+        })
+    
+    return render(request, 'diary/home.html', context)
 
 @login_required
 def book_list(request):
@@ -93,10 +101,6 @@ def book_create(request):
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user
-            
-            if 'cover_image' in request.FILES:
-                book.cover_image = request.FILES['cover_image']
-            
             book.save()
             return redirect('book_list')
     else:
@@ -123,10 +127,6 @@ def book_edit(request, pk):
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             book = form.save(commit=False)
-            
-            if 'cover_image' in request.FILES:
-                book.cover_image = request.FILES['cover_image']
-            
             book.save()
             return redirect('book_list')
     else:
@@ -306,11 +306,24 @@ def book_calendar(request):
         end_reading__lt=end_date
     )
 
-    # Создаем словарь с количеством книг по датам
-    books_count = defaultdict(int)
+    # Статистика
+    total_books = Book.objects.filter(
+        user=request.user,
+        end_reading__isnull=False
+    ).count()
+
+    books_this_month = books.count()
+
+    avg_rating = Book.objects.filter(
+        user=request.user,
+        rating__isnull=False
+    ).aggregate(Avg('rating'))['rating__avg'] or 0
+
+    # Создаем словарь с книгами по датам
+    books_by_date = defaultdict(list)
     for book in books:
         if book.end_reading:
-            books_count[book.end_reading.day] += 1
+            books_by_date[book.end_reading.day].extend([book])
 
     # Формируем данные для шаблона
     calendar_data = []
@@ -323,7 +336,8 @@ def book_calendar(request):
                 current_date = date(year, month, day)
                 week_data.append({
                     'date': current_date,
-                    'books_count': books_count[day],
+                    'books_count': len(books_by_date[day]),
+                    'books': books_by_date[day],
                     'today': current_date == today
                 })
             else:
@@ -355,7 +369,10 @@ def book_calendar(request):
         'prev_month': prev_month,
         'prev_year': prev_year,
         'next_month': next_month,
-        'next_year': next_year
+        'next_year': next_year,
+        'total_books': total_books,
+        'books_this_month': books_this_month,
+        'avg_rating': avg_rating,
     }
 
     return render(request, 'diary/book_calendar.html', context)

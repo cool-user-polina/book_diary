@@ -55,13 +55,52 @@
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">
-                                <svg class="account-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
-                                </svg>
-                                {{ user.username }}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle user-profile" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar">
+                                    <!-- Если у пользователя есть аватар, показываем его -->
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="Аватар">
+                                    {% else %}
+                                        <span>{{ user.email|first|upper }}</span>
+                                    {% endif %}
+                                </div>
+                                <span class="user-name">{{ user.email }}</span>
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="navbarDropdown">
+                                <li class="dropdown-header">
+                                    <div class="user-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">{{ user.book_set.count }}</span>
+                                            <span class="stat-label">Книг прочитано</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">{{ user.get_average_rating|floatformat:1 }}</span>
+                                            <span class="stat-label">Средний рейтинг</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'book_list' %}">
+                                    <svg class="menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" fill="currentColor"/>
+                                    </svg>
+                                    Мои книги
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'book_calendar' %}">
+                                    <svg class="menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" fill="currentColor"/>
+                                    </svg>
+                                    Календарь чтения
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                    <svg class="menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
+                                    </svg>
+                                    Выйти
+                                </a></li>
+                            </ul>
                         </li>
                         {% else %}
                         <li class="nav-item">

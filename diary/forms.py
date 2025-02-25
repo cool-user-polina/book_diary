@@ -18,7 +18,7 @@ class CustomLoginForm(AuthenticationForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['name', 'author', 'genre', 'year', 'impression', 'cover_image', 'rating']
+        fields = ['name', 'author', 'start_reading', 'end_reading', 'genre', 'year', 'impression', 'cover_image', 'rating']
         widgets = {
             'author': forms.TextInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
