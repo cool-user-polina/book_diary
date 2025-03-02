@@ -21,7 +21,8 @@ from diary import views as diary_views  # Импортируем наши view-�
 from diary.views import (
     register, custom_login, custom_logout, home,
     book_list, book_create, book_delete, book_detail,
-    book_edit, search_books, edit_book_from_api, book_calendar
+    book_edit, search_books, edit_book_from_api, book_calendar,
+   # Импортируйте ваш класс представления
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -40,6 +41,7 @@ urlpatterns = [
     path('search/', search_books, name='search_books'),
     path('edit-from-api/', edit_book_from_api, name='edit_book_from_api'),
     path('calendar/',book_calendar, name='book_calendar'),
+    path('book/add/', book_create, name='book_add'),  # Убедитесь, что это определено
 ]
 
 if settings.DEBUG:
